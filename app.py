@@ -5,8 +5,7 @@ import os
 from flask_cors import CORS
 from keras.models import load_model
 from tensorflow import keras as K
-
-
+import tensorflow as tf
 
 UPLOAD_FOLDER = os.path.basename('upload')
 
@@ -43,11 +42,6 @@ if request.method == 'POST' and 'photo' in request.files:
 """
 
 
-
-@app.route('/test', methods=['GET'])
-def test():
-    return "Hello world"
-
 @app.route('/upload', methods=['GET', 'POST'])
 def predict():
 
@@ -56,7 +50,6 @@ def predict():
     # print(app.config['UPLOAD_FOLDER'])
     if request.method == 'POST':
         # print(request.files['image'].read())
-        model = load_model('./convnet/vgg_catdog_model_all.h5')
 
         print(request.files)
         img_array = np.asarray(bytearray(request.files['image'].read()), dtype=np.uint8)
@@ -66,14 +59,20 @@ def predict():
 
         # cv2.imwrite('img.png', img)
         img = img.reshape(1, 150, 150, 3)
+
+
         print(img.shape)
 
-        # print(model.predict(img.reshape((1, 150, 150, 3))))
-        print(model.predict(img))
+        global model
+        result = model.predict(img)
 
-        K.backend.clear_session()
+        if (result.ravel()[0] > 0.5):
+            print("Dog")
+            return "Dog"
+        else:
+            print("Cat")
+            return "Cat"
 
-        # print(img_array.shape)
         return "Nothing"
 
     return "Nothing"
@@ -81,13 +80,9 @@ def predict():
 
 if __name__ == '__main__':
     
-    # import os
-    
-    # model._make_predict_function()
-    
 
-    # print(model.summary())
+    model = load_model('./convnet/vgg_catdog_model_all.h5')
+    print(model.predict(np.random.randn(1, 150, 150, 3)))
 
-    # print(model.get_weights())
 
     app.run(debug=False)
