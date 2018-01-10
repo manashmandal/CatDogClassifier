@@ -1,67 +1,83 @@
+import { Upload, Icon, Modal } from 'antd';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import { DatePicker, message } from 'antd';
-import {Button} from 'antd';
-import {Upload, Icon} from 'antd';
+import './indexStyle.css'
 
-const Dragger = Upload.Dragger;
 
-const props = {
-  name: 'image',
-  multiple: true,
-  action: '//localhost:5000/upload',
-  onChange(info) {
-    const status = info.file.status;
-    if (status !== 'uploading') {
-      console.log(info.file, info.fileList);
-    }
-    if (status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully.`);
-    } else if (status === 'error') {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-};
+class PicturesWall extends React.Component {
+  state = {
+    previewVisible: false,
+    previewImage: '',
+    fileList: [{
+      uid: -1,
+      name: 'xxx.png',
+      status: 'done',
+      url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+    }],
+    imageType: '',
+  };
 
-class App2 extends Component {
-  render(){
-    return (
-      <div> APp2 </div>
-    )
-  }
-}
+  handleCancel = () => this.setState({ previewVisible: false })
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      date: ''
-    };
+  handlePreview = (file) => {
+    this.setState({
+      previewImage: file.url || file.thumbUrl,
+      previewVisible: true,
+    });
   }
 
-  handleChange(date){
-    message.info('Selected Date: ' + date.toString());
-    this.setState({date});
-  }
+ // handleChange = ({ fileList, file }) => console.log({file}) //this.setState({ fileList })
 
-  render(){
-    return (
-      <div style={{ width: 400, margin: '100px auto' }}>
-          {/*<DatePicker onChange={value => this.handleChange(value)} /> */}
+ handleChange = ({fileList, file}) => {
+   this.setState({fileList});
 
-          <Dragger {...props}>
-          <p className="ant-upload-drag-icon">
-                <Icon type="inbox" />
-              </p>
-          </Dragger>
+   if (file.status === "uploading"){
+    //  console.log("UPLOADING");
+     this.setState({imageType: "Uploading"})
+   } else if (file.status === "done") {
+     this.setState({imageType: file.response})
+   }
+ }
 
-          <div style={{ marginTop: 20 }}>Date: {this.state.date.toString()}</div>
+ // handleChange(input, fileList){
+    // console.log(input);
+    // console.log(input.fileList);
+    // this.setState({})
+    // this.setState({
+    //   fileList: input.fileList
+    // })
+   // console.log(fileList);
+ // }
+
+  render() {
+    const { previewVisible, previewImage, fileList } = this.state;
+    const uploadButton = (
+      <div>
+        <Icon type="plus" />
+        <div className="ant-upload-text">Upload</div>
       </div>
-    )
+    );
+    return (
+      <div className="clearfix">
+        <Upload
+          name="image"
+          action="//localhost:5000/upload"
+          listType="picture-card"
+          fileList={fileList}
+          onPreview={this.handlePreview}
+          onChange={this.handleChange}
+        >
+          {fileList.length >= 3 ? null : uploadButton}
+        </Upload>
+        <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+          <img alt="example" style={{ width: '100%' }} src={previewImage} />
+        </Modal>
+        <div>
+            <h1>{this.state.imageType}</h1>
+        </div>
+      </div>
+    );
   }
 }
 
-
-
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<PicturesWall />, document.getElementById('root'));
