@@ -3,6 +3,9 @@ import cv2
 import numpy as np
 import os
 from flask_cors import CORS
+from keras.models import load_model
+from tensorflow import keras as K
+
 
 
 UPLOAD_FOLDER = os.path.basename('upload')
@@ -53,20 +56,38 @@ def predict():
     # print(app.config['UPLOAD_FOLDER'])
     if request.method == 'POST':
         # print(request.files['image'].read())
-        
+        model = load_model('./convnet/vgg_catdog_model_all.h5')
+
         print(request.files)
         img_array = np.asarray(bytearray(request.files['image'].read()), dtype=np.uint8)
 
         img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-        img = cv2.resize(img, (44, 44), interpolation=cv2.INTER_CUBIC)
+        img = cv2.resize(img, (150, 150), interpolation=cv2.INTER_CUBIC)
 
-        cv2.imwrite('img.png', img)
-
+        # cv2.imwrite('img.png', img)
+        img = img.reshape(1, 150, 150, 3)
         print(img.shape)
 
+        # print(model.predict(img.reshape((1, 150, 150, 3))))
+        print(model.predict(img))
+
+        K.backend.clear_session()
+
         # print(img_array.shape)
+        return "Nothing"
 
     return "Nothing"
 
 
-app.run(debug=True)
+if __name__ == '__main__':
+    
+    # import os
+    
+    # model._make_predict_function()
+    
+
+    # print(model.summary())
+
+    # print(model.get_weights())
+
+    app.run(debug=False)
