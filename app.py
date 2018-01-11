@@ -11,57 +11,33 @@ UPLOAD_FOLDER = os.path.basename('upload')
 
 app = Flask(__name__)
 CORS(app)
+
+# Application configs
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-def url_to_image(url, resize=224):
+def img_to_array(raw_file, shape=150):
   """
-  downloads an image from url, converts to numpy array,
-  resizes, and returns it
+  Converts raw file to numpy array
   """
-  response = urllib.urlopen(url)
-  img = np.asarray(bytearray(response.read()), dtype=np.uint8)
+  NUM_CHANNEL = 3
+  img = np.asarray(bytearray(raw_file.read()), dtype=np.uint8)
   img = cv2.imdecode(img, cv2.IMREAD_COLOR)
-  img = cv2.resize(img, (resize, resize), interpolation=cv2.INTER_CUBIC)
-  return img
+  img = cv2.resize(img, (shape, shape), interpolation=cv2.INTER_CUBIC)
+  return img.reshape(1, shape, shape, NUM_CHANNEL)
 
 
-"""
-if request.method == 'POST' and 'photo' in request.files:
-        photo = request.files['photo']
-        in_memory_file = io.BytesIO()
-        photo.save(in_memory_file)
-        data = np.fromstring(in_memory_file.getvalue(), dtype=np.uint8)
-        color_image_flag = 1
-        img = cv2.imdecode(data, color_image_flag)
-
-        https://shuaiw.github.io/2017/02/01/deep-learning-model-as-rest-api.html
-        https://medium.com/@antoinegrandiere/image-upload-and-moderation-with-python-and-flask-e7585f43828a
-        https://stackoverflow.com/questions/22181384/javascript-no-access-control-allow-origin-header-is-present-on-the-requested
-"""
+@app.route('/test', methods=['GET'])
+def test():
+    return "<h1>Testing App</h1>"
 
 
 @app.route('/upload', methods=['GET', 'POST'])
 def predict():
-
-    #if request.method == 'POST':
-        # pass
-    # print(app.config['UPLOAD_FOLDER'])
     if request.method == 'POST':
-        # print(request.files['image'].read())
 
-        print(request.files)
-        img_array = np.asarray(bytearray(request.files['image'].read()), dtype=np.uint8)
-
-        img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-        img = cv2.resize(img, (150, 150), interpolation=cv2.INTER_CUBIC)
-
-        # cv2.imwrite('img.png', img)
-        img = img.reshape(1, 150, 150, 3)
-
-
-        print(img.shape)
+        img = img_to_array(request.files['image'])
 
         global model
         result = model.predict(img)
@@ -73,15 +49,14 @@ def predict():
             print("Cat")
             return "Cat"
 
-        return "Nothing"
-
     return "Nothing"
 
 
 if __name__ == '__main__':
     
-
+    # Loading the model
     model = load_model('./convnet/vgg_catdog_model_all.h5')
+    # Keras session bugfix - predicting something on loading the model 
     print(model.predict(np.random.randn(1, 150, 150, 3)))
 
 
