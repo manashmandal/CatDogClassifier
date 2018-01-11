@@ -36,6 +36,9 @@ class PicturesWall extends React.Component {
    } else if (file.status === "done") {
      this.setState({imageType: file.response})
      this.setState({currentImage: file.thumbUrl})
+   } else {
+     this.setState({imageType: "Error Occured"})
+     this.setState({currentImage: 'http://www.pvhc.net/img142/akjotcylwoyoptqicgjr.png' })
    }
  }
 
