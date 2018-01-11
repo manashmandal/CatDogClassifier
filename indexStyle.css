@@ -8,3 +8,13 @@
     color: #666;
   }
 
+
+  #placeholderImage {
+    max-width: 300px;
+    max-height: 300px;
+  }
+
+  #placeHolderImageSource {
+    max-width: 300px;
+    max-height: 300px;
+  }

@@ -1,20 +1,25 @@
-import { Upload, Icon, Modal } from 'antd';
+import { Upload, Icon, Modal, Card } from 'antd';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import './indexStyle.css'
+
+const { Meta } = Card;
+
 
 
 class PicturesWall extends React.Component {
   state = {
     previewVisible: false,
     previewImage: '',
-    fileList: [{
-      uid: -1,
-      name: 'xxx.png',
-      status: 'done',
-      url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    }],
+    fileList: [],
+    // fileList: [{
+    //   uid: -1,
+    //   name: 'xxx.png',
+    //   status: 'done',
+    //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+    // }],
     imageType: '',
+    currentImage: '',
   };
 
   handleCancel = () => this.setState({ previewVisible: false })
@@ -26,28 +31,20 @@ class PicturesWall extends React.Component {
     });
   }
 
- // handleChange = ({ fileList, file }) => console.log({file}) //this.setState({ fileList })
 
  handleChange = ({fileList, file}) => {
+   console.log(file);
    this.setState({fileList});
 
    if (file.status === "uploading"){
-    //  console.log("UPLOADING");
      this.setState({imageType: "Uploading"})
    } else if (file.status === "done") {
      this.setState({imageType: file.response})
+     this.setState({currentImage: file.thumbUrl})
    }
  }
 
- // handleChange(input, fileList){
-    // console.log(input);
-    // console.log(input.fileList);
-    // this.setState({})
-    // this.setState({
-    //   fileList: input.fileList
-    // })
-   // console.log(fileList);
- // }
+
 
   render() {
     const { previewVisible, previewImage, fileList } = this.state;
@@ -59,6 +56,19 @@ class PicturesWall extends React.Component {
     );
     return (
       <div className="clearfix">
+        <Card
+          hoverable
+          style={{ width: 240 }}
+          cover={<img alt="example" src={this.state.currentImage} />}
+        >
+
+      <Meta
+        title={this.state.imageType}
+        description="Cat Dog Classification Result"
+      />
+
+        </Card>
+
         <Upload
           name="image"
           action="//localhost:5000/upload"
@@ -66,15 +76,13 @@ class PicturesWall extends React.Component {
           fileList={fileList}
           onPreview={this.handlePreview}
           onChange={this.handleChange}
+          multiple={false}
         >
-          {fileList.length >= 3 ? null : uploadButton}
+          {uploadButton}
         </Upload>
         <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
           <img alt="example" style={{ width: '100%' }} src={previewImage} />
         </Modal>
-        <div>
-            <h1>{this.state.imageType}</h1>
-        </div>
       </div>
     );
   }
