@@ -12,14 +12,8 @@ class PicturesWall extends React.Component {
     previewVisible: false,
     previewImage: '',
     fileList: [],
-    // fileList: [{
-    //   uid: -1,
-    //   name: 'xxx.png',
-    //   status: 'done',
-    //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    // }],
     imageType: '',
-    currentImage: '',
+    currentImage: 'https://kaggle2.blob.core.windows.net/competitions/kaggle/3362/media/woof_meow.jpg',
   };
 
   handleCancel = () => this.setState({ previewVisible: false })
@@ -38,6 +32,7 @@ class PicturesWall extends React.Component {
 
    if (file.status === "uploading"){
      this.setState({imageType: "Uploading"})
+     this.setState({currentImage: 'https://loading.io/spinners/bricks/lg.block-rotate-loading-gif.gif'})
    } else if (file.status === "done") {
      this.setState({imageType: file.response})
      this.setState({currentImage: file.thumbUrl})
@@ -55,19 +50,26 @@ class PicturesWall extends React.Component {
       </div>
     );
     return (
-      <div className="clearfix">
-        <Card
-          hoverable
-          style={{ width: 240 }}
-          cover={<img alt="example" src={this.state.currentImage} />}
-        >
+      <div className="clearfix container">
+      <div className="row">
 
-      <Meta
-        title={this.state.imageType}
-        description="Cat Dog Classification Result"
-      />
+      <div className="col-md-offset-4 col-xs-offset-4" id="imageCard">
+            <Card
+              hoverable
+              style={{ width: 350 }}
+              cover={<img alt="example" src={this.state.currentImage} />}
+            >
 
-        </Card>
+          <Meta
+            title={this.state.imageType}
+            description="Cat Dog Classification Result"
+          />
+
+          </Card>
+      </div>
+      </div>
+
+      <div className="row">
 
         <Upload
           name="image"
@@ -83,6 +85,8 @@ class PicturesWall extends React.Component {
         <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
           <img alt="example" style={{ width: '100%' }} src={previewImage} />
         </Modal>
+      </div>
+
       </div>
     );
   }

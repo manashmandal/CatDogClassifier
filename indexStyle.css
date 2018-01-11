@@ -9,7 +9,7 @@
   }
 
 
-  #placeholderImage {
+  /* #placeholderImage {
     max-width: 300px;
     max-height: 300px;
   }
@@ -17,4 +17,9 @@
   #placeHolderImageSource {
     max-width: 300px;
     max-height: 300px;
+  } */
+
+
+  #imageCard {
+    margin-bottom: 25px;
   }
