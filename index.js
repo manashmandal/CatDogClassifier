@@ -1,4 +1,4 @@
-import { Upload, Icon, Modal, Card } from 'antd';
+import { Upload, Icon, Modal, Card, message } from 'antd';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import './indexStyle.css'
@@ -16,6 +16,7 @@ class PicturesWall extends React.Component {
     currentImage: 'https://kaggle2.blob.core.windows.net/competitions/kaggle/3362/media/woof_meow.jpg',
   };
 
+
   handleCancel = () => this.setState({ previewVisible: false })
 
   handlePreview = (file) => {
@@ -27,7 +28,8 @@ class PicturesWall extends React.Component {
 
 
  handleChange = ({fileList, file}) => {
-   console.log(file);
+   this.setState({loadingCount: this.state.loadingCount + 1});
+
    this.setState({fileList});
 
    if (file.status === "uploading"){
@@ -36,9 +38,11 @@ class PicturesWall extends React.Component {
    } else if (file.status === "done") {
      this.setState({imageType: file.response})
      this.setState({currentImage: file.thumbUrl})
-   } else {
-     this.setState({imageType: "Error Occured"})
-     this.setState({currentImage: 'http://www.pvhc.net/img142/akjotcylwoyoptqicgjr.png' })
+     message.success("This is a " + file.response);
+   } else if (file.status === 'error') {
+     this.setState({imageType: "Error Occured"});
+     this.setState({currentImage: 'http://www.pvhc.net/img142/akjotcylwoyoptqicgjr.png' });
+     message.error("Couldn't upload the file properly");
    }
  }
 
